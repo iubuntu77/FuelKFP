@@ -32,7 +32,7 @@ def mnist_serveonly(model_export_dir='gs://your-bucket/export'
   serve = dsl.ContainerOp(
       name='serve',
       image='gcr.io/google-samples/ml-pipeline-kubeflow-tfserve:v2',
-      arguments=["--model_name", 'mnist-%s' % (dsl.RUN_ID_PLACEHOLDER,),
+      arguments=["--model_name", 'mnist' ,
           "--model_path",
           'gs://a-kb-poc-262417/mnist2/export/model'
           ]
