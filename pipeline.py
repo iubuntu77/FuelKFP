@@ -27,14 +27,14 @@ from kfp.dsl.types import String
   description='Demonstrate TF-Serving'
 )
 
-  serve = dsl.ContainerOp(
-      name='serve',
-      image='gcr.io/google-samples/ml-pipeline-kubeflow-tfserve:v2',
-      arguments=["--model_name", 'mnist-%s' % (dsl.RUN_ID_PLACEHOLDER,),
+serve = dsl.ContainerOp(
+   name='serve',
+   image='gcr.io/google-samples/ml-pipeline-kubeflow-tfserve:v2',
+   arguments=["--model_name", 'mnist-%s' % (dsl.RUN_ID_PLACEHOLDER,),
           "--model_path",
           'gs://a-kb-poc-262417/mnist2/export/model'
           ]
-      ).apply(gcp.use_gcp_secret('user-gcp-sa'))
+   ).apply(gcp.use_gcp_secret('user-gcp-sa'))
 
 if __name__ == '__main__':
   import kfp.compiler as compiler
