@@ -17,58 +17,25 @@ Kubeflow Pipelines MNIST example
 Run this script to compile pipeline
 """
 
-
 import kfp.dsl as dsl
 import kfp.gcp as gcp
-import kfp.onprem as onprem
+from kfp.dsl.types import String
 
-platform = 'GCP'
 
 @dsl.pipeline(
-  name='Fuel',
-  description='Fuel Prediction pipeline.'
+  name='MNIST Serve Pipeline',
+  description='Demonstrate TF-Serving'
 )
-def fuel_pipeline(model_export_dir='gs://your-bucket/export',
-                   train_steps='200',
-                   learning_rate='0.01',
-                   batch_size='100',
-                   pvc_name=''):
-  preprocess= dsl.ContainerOp(
-      name='preprocess',
-      image='gcr.io/kb-poc-262417/fuel:latest',
-      arguments=[
-          'input/fuel.csv',
-          'output',
-          'gs://a-kb-poc-262417/fuel',
-          ]
-  )
 
-  train= dsl.ContainerOp(
-      name='train',
-      image='gcr.io/kb-poc-262417/fuel/train:latest',
-      arguments=[
-          'gs://a-kb-poc-262417/fuel',
-          ]
-  )
-  train.after(preprocess)
-  
-  serve= dsl.ContainerOp(
+  serve = dsl.ContainerOp(
       name='serve',
-      image='gcr.io/kb-poc-262417/fuel/serve:latest',
-      arguments=[
-          'gs://a-kb-poc-262417/fuel',
+      image='gcr.io/google-samples/ml-pipeline-kubeflow-tfserve:v2',
+      arguments=["--model_name", 'mnist-%s' % (dsl.RUN_ID_PLACEHOLDER,),
+          "--model_path",
+          'gs://a-kb-poc-262417/mnist2/export/model'
           ]
-  )
-
-  serve.after(train)
-
-  steps = [preprocess, train, serve]
-  for step in steps:
-    if platform == 'GCP':
-      step.apply(gcp.use_gcp_secret('user-gcp-sa'))
-    else:
-      step.apply(onprem.mount_pvc(pvc_name, 'local-storage', '/mnt'))
+      ).apply(gcp.use_gcp_secret('user-gcp-sa'))
 
 if __name__ == '__main__':
   import kfp.compiler as compiler
-  compiler.Compiler().compile(fuel_pipeline, __file__ + '.tar.gz')
+  compiler.Compiler().compile(tf-serve-pipeline, __file__ + '.tar.gz')
