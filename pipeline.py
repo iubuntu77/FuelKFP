@@ -23,19 +23,23 @@ from kfp.dsl.types import String
 
 
 @dsl.pipeline(
-  name='MNIST Serve Pipeline',
+  name='MNIST Pipeline',
   description='Demonstrate TF-Serving'
 )
+def mnist_serveonly(model_export_dir='gs://your-bucket/export'
+  ):
 
-serve = dsl.ContainerOp(
-   name='serve',
-   image='gcr.io/google-samples/ml-pipeline-kubeflow-tfserve:v2',
-   arguments=["--model_name", 'mnist-%s' % (dsl.RUN_ID_PLACEHOLDER,),
+  serve = dsl.ContainerOp(
+      name='serve',
+      image='gcr.io/google-samples/ml-pipeline-kubeflow-tfserve:v2',
+      arguments=["--model_name", 'mnist-%s' % (dsl.RUN_ID_PLACEHOLDER,),
           "--model_path",
           'gs://a-kb-poc-262417/mnist2/export/model'
           ]
-   ).apply(gcp.use_gcp_secret('user-gcp-sa'))
+      ).apply(gcp.use_gcp_secret('user-gcp-sa'))
+
+
 
 if __name__ == '__main__':
   import kfp.compiler as compiler
-  compiler.Compiler().compile(tf-serve-pipeline, __file__ + '.tar.gz')
+  compiler.Compiler().compile(mnist_serveonly, __file__ + '.tar.gz')
