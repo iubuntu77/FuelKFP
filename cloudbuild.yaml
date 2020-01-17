@@ -8,7 +8,3 @@ steps:
   - 'pip install -r requirements.txt --upgrade && python pipeline.py'
 #- name: 'gcr.io/cloud-builders/curl'
 #  args: ['-F', 'uploadfile=@pipeline.py.tar.gz', '-X', 'POST', 'my-kf-demo.endpoints.kb-poc-262417.cloud.goog/apis/v1beta1/pipelines/upload?name=KFP_DEMO']
-artifacts:
-  objects:
-    location: 'gs://my-mnist-4321/'
-    paths: ['pipeline.py.tar.gz']
