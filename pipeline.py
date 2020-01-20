@@ -27,18 +27,17 @@ platform = 'GCP'
   name='Fuel',
   description='Fuel Prediction pipeline.'
 )
-def fuel_pipeline(model_export_dir='gs://your-bucket/export',
-                   train_steps='200',
-                   learning_rate='0.01',
-                   batch_size='100',
-                   pvc_name=''):
+def fuel_pipeline(bucket_name='gs://your-bucket/export',
+                   input_file='folder/file',
+                   output_folder='output folder',
+                   epochs = 10):
   preprocess= dsl.ContainerOp(
       name='preprocess',
       image='gcr.io/kb-poc-262417/fuel:latest',
       arguments=[
-          'input/fuel.csv',
-          'output',
-          'gs://a-kb-poc-262417/fuel',
+          '--input_file', input_file,
+          '--output_folder', output_folder,
+          '--bucket_name', bucket_name
           ]
   )
 
@@ -46,7 +45,8 @@ def fuel_pipeline(model_export_dir='gs://your-bucket/export',
       name='train',
       image='gcr.io/kb-poc-262417/fuel/train:latest',
       arguments=[
-          'gs://a-kb-poc-262417/fuel',
+          '--bucket_name', bucket_name,
+          '--epochs', epochs
           ]
   )
   train.after(preprocess)
@@ -55,7 +55,7 @@ def fuel_pipeline(model_export_dir='gs://your-bucket/export',
       name='serve',
       image='gcr.io/kb-poc-262417/fuel/serve:latest',
       arguments=[
-          'gs://a-kb-poc-262417/fuel',
+          '--bucket_name',bucket_name
           ]
   )
 
